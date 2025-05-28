@@ -1,33 +1,60 @@
-//Gate-level modeling
-module and_gate_gatelevel(output Y, input A, B);
-  and (Y, A, B);
+// AND gate - Gate Level Modeling
+module and_gate_gate_level (
+    input a, b,
+    output y
+);
+    and G1 (y, a, b);
 endmodule
 
-//Testbench
-module tb_and_gate_gatelevel;
+// AND gate - Dataflow Modeling
+module and_gate_dataflow (
+    input a, b,
+    output y
+);
+    assign y = a & b;
+endmodule
 
-  // Declare testbench variables
-  reg A, B;
-  wire Y;
+// AND gate - Behavioral Modeling
+module and_gate_behavioral (
+    input a, b,
+    output reg y
+);
+    always @(*) begin
+        if (a == 1 && b == 1)
+            y = 1;
+        else
+            y = 0;
+    end
+endmodule
 
-  // Instantiate the module under test
-  and_gate_gatelevel uut (
-    .Y(Y),
-    .A(A),
-    .B(B)
-  );
 
-  initial begin
-    $display("A B | Y");
-    $monitor("%b %b | %b", A, B, Y);
+// Testbench for all AND gate models
+module tb_and_gate;
 
-    // Apply test vectors
-    A = 0; B = 0; #10;
-    A = 0; B = 1; #10;
-    A = 1; B = 0; #10;
-    A = 1; B = 1; #10;
+    reg a, b;
+    wire y_gate, y_dataflow, y_behavioral;
 
-    $finish;
-  end
+    // Instantiate the gate-level AND gate
+    and_gate_gate_level U1 (.a(a), .b(b), .y(y_gate));
+
+    // Instantiate the dataflow AND gate
+    and_gate_dataflow U2 (.a(a), .b(b), .y(y_dataflow));
+
+    // Instantiate the behavioral AND gate
+    and_gate_behavioral U3 (.a(a), .b(b), .y(y_behavioral));
+
+    initial begin
+        $monitor("Time=%0t | a=%b b=%b | gate=%b dataflow=%b behavioral=%b",
+                 $time, a, b, y_gate, y_dataflow, y_behavioral);
+
+        // Apply all input combinations
+        a = 0; b = 0; #10;
+        a = 0; b = 1; #10;
+        a = 1; b = 0; #10;
+        a = 1; b = 1; #10;
+
+        $finish;
+    end
 
 endmodule
++++++++++++++++++++++++++++++++++++++
